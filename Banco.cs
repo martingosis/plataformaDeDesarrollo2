@@ -120,7 +120,7 @@ namespace InterfazTP
 
         }
 
-        public void BajaCajaAhorro(int id)
+        public bool BajaCajaAhorro(int id)
         {
             if (usuarioActual != null)
             {
@@ -132,23 +132,12 @@ namespace InterfazTP
                         {
                             usuarioActual.cajas.Remove(c);
                             caja.Remove(c);
+                            return true;
                         }
-                        else
-                        {
-                            Console.WriteLine("La caja no se puede eliminar si cuenta con saldo.");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("No tiene cajas de ahorro asociadas.");
                     }
                 }
             }
-            else
-            {
-                Console.WriteLine("No tiene cajas de ahorro.");
-            }
-
+            return false;
         }
 
         public void ModificarCajaAhorro(int id)
@@ -166,24 +155,6 @@ namespace InterfazTP
                 }
             }
         }
-
-        /* public bool IniciarSesion(string usuario, string contraseña)
-         {
-             bool encontre = false;
-
-             foreach (Usuario usuarioInd in this.usuario)
-             {
-
-
-                 if (usuarioInd.usuarioLogin == usuario && usuarioInd.password == contraseña)
-                 {
-                     encontre = true;
-                     usuarioActual = usuarioInd;
-                 }
-
-             }
-             return encontre;
-         }*/
 
         // CLAUDIO
         public void AltaMovimiento(Movimiento mov, CajaDeAhorro entrada)
@@ -225,10 +196,19 @@ namespace InterfazTP
             }
         }
 
-        public void AltaPlazoFijo(PlazoFijo pfj, Usuario usuario)
+        public bool AltaPlazoFijo(PlazoFijo pfj, int cbu)
         {
-            usuario.pf.Add(pfj);
-            plazosFijos.Add(pfj);
+            foreach(CajaDeAhorro c in caja)
+            {
+                if(c.cbu == cbu && c.saldo >= pfj.monto && pfj.monto >= 1000)
+                {
+                    usuarioActual.pf.Add(pfj);
+                    plazosFijos.Add(pfj);
+                    c.saldo -= pfj.monto;    
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void BajaPlazoFijo(int id)
@@ -256,7 +236,8 @@ namespace InterfazTP
             {
                 if(pf.id == plazoFijoID)
                 {
-                    //usuarioActual.cajas.First().saldo;
+                    usuarioActual.cajas.First().saldo = pf.monto + (pf.monto*(pf.getTasa() / 365));
+                    pf.pagado = true;
                 }
             }
         }
@@ -293,37 +274,28 @@ namespace InterfazTP
 
                         if (usuarioInd.bloqueado == false)
                         {
-
-                            while (usuarioInd.intentosFallidos < 4 && encontrado == false)
+                            // agregar verificacion usuario
+                            if (usuarioInd.password == contrasenia)
                             {
+                                usuarioActual = usuarioInd;
+                                usuarioInd.intentosFallidos = 0;
+                                encontrado = true;
+                            }
+                            else
+                            {
+                                usuarioInd.intentosFallidos++;
 
-
-                                // agregar verificacion usuario
-                                if (usuarioInd.password == contrasenia)
+                                if (usuarioInd.intentosFallidos == 4)
                                 {
-                                    usuarioActual = usuarioInd;
-                                    usuarioInd.intentosFallidos = 0;
-                                    encontrado = true;
+
+                                    usuarioInd.bloqueado = true;
                                 }
-                                else
-                                {
-                                    usuarioInd.intentosFallidos++;
 
-                                    if (usuarioInd.intentosFallidos == 4)
-                                    {
-
-                                        usuarioInd.bloqueado = true;
-                                    }
-
-                                }
                             }
                         }
-
                     }
-
                 }
-
-
+           
             }
             catch (Exception i)
             {
@@ -405,29 +377,25 @@ namespace InterfazTP
         public List<Pago> MostrarPagos()
         {
             // Verificar el devolver con toList
-            return usuarioActual.pagos;
+            return usuarioActual.pagos.ToList();
         }
 
         public List<PlazoFijo> MostrarPlazoFijos()
         {
-            return usuarioActual.pf;
+            return usuarioActual.pf.ToList();
         }
 
         public List<Movimiento> MostrarMovimientos(int cajaID)
         {
             if (usuarioActual != null)
             {
-                foreach (CajaDeAhorro cajas in usuarioActual.cajas)
+                foreach (CajaDeAhorro c in usuarioActual.cajas)
                 {
-                    if (cajaID == cajas.id)
+                    if (cajaID == c.id)
                     {
-                        return cajas.movimientos.ToList();
+                        return c.movimientos.ToList();
                     }
                 }
-            }
-            else
-            {
-                Console.WriteLine("error en la lista 135");
             }
             return null;
         }
@@ -475,11 +443,6 @@ namespace InterfazTP
         public List<CajaDeAhorro> MostrarCajasDeAhorro()
         {
             return this.usuarioActual.cajas.ToList();
-        }
-
-        public List<Movimiento> MostrarMovimientos()
-        {
-            return this.movimientos.ToList();
         }
     }
 }

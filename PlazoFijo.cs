@@ -14,17 +14,22 @@ namespace InterfazTP
         public float monto { get; set; }
         public DateTime fechaIni { get; set; }
         public DateTime fechaFin { get; set; }
-        public static float tasa = 60;
+        public static float tasa { get; set; } = 60;
         public bool pagado { get; set; }
 
-        public PlazoFijo(Usuario titular, float monto, DateTime fechaFin)
+        public PlazoFijo(Usuario titular, float monto)
         {
             id = generarId();
             this.titular = titular;
             this.monto = monto;
             this.fechaIni = DateTime.Now;
-            this.fechaFin = fechaFin;
+            this.fechaFin.AddYears(0001);
             pagado = false;
+        }
+
+        public float getTasa()
+        {
+            return tasa;
         }
 
         private int generarId()

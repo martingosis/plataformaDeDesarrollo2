@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
@@ -19,6 +20,7 @@ namespace InterfazTP
         public Banco banco;
         public TransDelegadoModificarUsuario TransFModificarUsuario;
         private int selectedCaja;
+        private int selectedPLazoFijo;
 
         public Main(string usuario, Banco banco)
         {
@@ -28,6 +30,7 @@ namespace InterfazTP
             refreshDataCbu();
             refreshDataPlazoFijo();
             OBSPLazosFijos();
+            label9.Text = PlazoFijo.tasa.ToString();
         }
 
         public Main(object[] args)
@@ -67,10 +70,12 @@ namespace InterfazTP
         {
             comboBox1.Items.Clear();
             comboBox2.Items.Clear();
+            comboBox3.Items.Clear();
 
             foreach (CajaDeAhorro c in banco.usuarioActual.obtenerCajas())
             {
                 comboBox1.Items.Add(c.cbu.ToString());
+                comboBox3.Items.Add(c.cbu.ToString());
             }
 
             foreach (CajaDeAhorro c in banco.MostrarCajasDeAhorro())
@@ -83,21 +88,20 @@ namespace InterfazTP
         {
             dataGridView5.Rows.Clear();
 
-            foreach (Movimiento m in banco.MostrarMovimientos(selectedCaja))
+            foreach (Movimiento m in   banco.MostrarMovimientos(this.selectedCaja))
             {
                 dataGridView5.Rows.Add(m.toArray());
             }
         }
 
-        // Seleccionador de caja 
-        private void dataGridView1_SelectionChanged(object sender, EventArgs e)
+        // Seleccionador de caja
+        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             selectedCaja = Convert.ToInt32(dataGridView1.Rows[dataGridView1.CurrentRow.Index].Cells[0].Value);
-            if (selectedCaja != null)
+            if (selectedCaja != null && selectedCaja != 0)
             {
                 refreshDataCajaMovimientos();
             }
-
         }
 
         // Agregar Caja Ahorro
@@ -113,9 +117,18 @@ namespace InterfazTP
         //Eliminar Caja de Ahorro
         private void button3_Click(object sender, EventArgs e)
         {
-            banco.BajaCajaAhorro(Convert.ToInt32(dataGridView1.Rows[dataGridView1.CurrentRow.Index].Cells[0].Value));
-            refreshDataCajaDeAhorro();
-            refreshDataCbu();
+            if (banco.BajaCajaAhorro(Convert.ToInt32(dataGridView1.Rows[dataGridView1.CurrentRow.Index].Cells[0].Value)))
+            {
+                selectedCaja = banco.usuarioActual.obtenerCajas().First().id;
+                refreshDataCbu();
+                refreshDataCajaDeAhorro();
+            }
+            else
+            {
+                MessageBox.Show("No se pudo eliminar la cuenta");
+            }
+            
+
         }
 
         //Retirar
@@ -151,6 +164,7 @@ namespace InterfazTP
             }
         }
 
+        // Cobrar plazos fijos si se cumplio la fecha
         private void OBSPLazosFijos()
         {
             foreach(PlazoFijo p in banco.usuarioActual.pf)
@@ -165,12 +179,21 @@ namespace InterfazTP
         //Agregar Plazo Fijo
         private void button4_Click(object sender, EventArgs e)
         {
-
+            if (banco.AltaPlazoFijo(new PlazoFijo(banco.usuarioActual, float.Parse(textBox3.Text)), Convert.ToInt32(comboBox3.Text)))
+            {
+                MessageBox.Show("Se creo tu plazo fijo");
+                refreshDataPlazoFijo();
+            }
+            else
+            {
+                MessageBox.Show("Hubo un problema al crear el plazo fijo");
+            }
         }
 
+        //Eliminar Plazo Fijo
         private void button6_Click(object sender, EventArgs e)
         {
-
+            
         }
 
 
@@ -240,13 +263,19 @@ namespace InterfazTP
 
         }
 
-        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void label7_Click(object sender, EventArgs e)
         {
 
         }
 
-        private void label7_Click(object sender, EventArgs e)
+        private void tabPage2_Click(object sender, EventArgs e)
         {
+
+        }
+
+        private void dataGridView1_SelectionChanged(object sender, EventArgs e)
+        {
+
 
         }
 

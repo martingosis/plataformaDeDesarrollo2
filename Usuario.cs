@@ -19,6 +19,8 @@ namespace InterfazTP
         public string password { get; set; }
         public int intentosFallidos { get; set; }
         public bool bloqueado { get; set; }
+
+        public bool administrador { get; set; }
         public List<CajaDeAhorro> cajas { get; set; }
         public List<PlazoFijo> pf { get; set; }
         public List<TarjetaDeCredito> tarjeta { get; set; }
@@ -37,6 +39,8 @@ namespace InterfazTP
             pf = new List<PlazoFijo>();
 
             cajas = new List<CajaDeAhorro>(10);
+            
+            administrador = false;
 
         }
 
