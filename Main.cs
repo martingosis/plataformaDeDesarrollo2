@@ -236,7 +236,9 @@ namespace InterfazTP
 
         private void button9_Click(object sender, EventArgs e)
         {
-
+            banco.AltaTarjetaCredito(banco.usuarioActual);
+            MessageBox.Show("Se agrego una nueva tarjeta de credito.");
+            refreshDataTarjetasDeCredito();
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -279,5 +281,9 @@ namespace InterfazTP
 
         }
 
+        private void dataGridView4_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
     }
 }
