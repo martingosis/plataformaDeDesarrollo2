@@ -242,21 +242,60 @@ namespace InterfazTP
             }
         }
 
-        // AUGUSTO
+        // LUCAS
 
-        public void AltaTarjetaCredito(Usuario usuario)
+        public void AltaTarjetaCredito()
         {
-
+            if (usuarioActual != null)
+            {
+                //Datos MOCKEADOS
+                TarjetaDeCredito tarjetaDeCredito = new TarjetaDeCredito(usuarioActual);
+                tarjetaDeCredito.titular = usuarioActual;
+                tarjetaDeCredito.limite = 50000;
+                tarjetaDeCredito.id = usuarioActual.id;
+                tarjetaDeCredito.codigoV = new DateOnly(2020, 02, 01);
+                tarjetaDeCredito.consumos = 0;
+                usuarioActual.tarjeta.Add(tarjetaDeCredito);
+            }
         }
 
         public void BajaTarjetaCredito()
         {
+            if (usuarioActual != null && usuarioActual.tarjeta.Count != 0)
+            {
+                foreach (var t in usuarioActual.tarjeta)
+                {
+                    if (t.consumos == 0)
+                    {
+                        Console.WriteLine("Tarjeta eliminada exitosamente");
+                        usuarioActual.tarjeta.Remove(t);
+                    }
+                    else
+                    {
+                        Console.WriteLine("No se puede eliminar su tarjeta de credito porque tiene consumos pendientes");
+                    }
+                }
+            }
 
         }
 
         public void ModificarTarjetaDeCredito()
         {
+            if (usuarioActual != null)
+            {
+                foreach (var t in usuarioActual.tarjeta)
+                {
+                    if (usuarioActual.id == t.id)
+                    {
+                        t.limite = 0;
+                    }
+                }
+            }
+        }
 
+        public List<TarjetaDeCredito> MostrarTarjetasDeCredito()
+        {
+            return usuarioActual.tarjeta;
         }
 
         // Martin

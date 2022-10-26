@@ -13,7 +13,7 @@ namespace InterfazTP
         public Usuario titular { get; set; }
         public int numero { get; set; }
         public static int ultimoNumero = 40000000;
-        public int odigoV { get; set; }
+        public DateOnly codigoV { get; set; }
         public float limite { get; set; }
         public float consumos { get; set; }
 
@@ -24,7 +24,6 @@ namespace InterfazTP
             id = generarId();
             this.titular = titular;
             generarNumero();
-            odigoV = rnd.Next(100, 999);
             limite = 100000;
             consumos = 0;
         }
