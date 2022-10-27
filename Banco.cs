@@ -278,7 +278,7 @@ namespace InterfazTP
 
         }
 
-        public void ModificarTarjetaDeCredito()
+        public void ModificarTarjetaDeCredito(Usuario usuarioActual)
         {
             if (usuarioActual != null)
             {

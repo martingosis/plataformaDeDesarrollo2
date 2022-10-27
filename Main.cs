@@ -226,12 +226,9 @@ namespace InterfazTP
 
         private void button11_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void dataGridView2_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
+            banco.BajaTarjetaCredito(banco.usuarioActual);
+            MessageBox.Show("Se elimino una nueva tarjeta de credito.");
+            refreshDataTarjetasDeCredito();
         }
 
         private void button9_Click(object sender, EventArgs e)
@@ -239,6 +236,19 @@ namespace InterfazTP
             banco.AltaTarjetaCredito(banco.usuarioActual);
             MessageBox.Show("Se agrego una nueva tarjeta de credito.");
             refreshDataTarjetasDeCredito();
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            banco.ModificarTarjetaDeCredito(banco.usuarioActual);
+            MessageBox.Show("Se modifico una nueva tarjeta de credito.");
+            refreshDataTarjetasDeCredito();
+        }
+
+
+        private void dataGridView2_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -285,5 +295,6 @@ namespace InterfazTP
         {
 
         }
+
     }
 }
