@@ -243,13 +243,12 @@ namespace InterfazTP
         }
 
         // LUCAS
-
-        public void AltaTarjetaCredito()
+        public void AltaTarjetaCredito(Usuario usuarioActual)
         {
             if (usuarioActual != null)
             {
                 //Datos MOCKEADOS
-                TarjetaDeCredito tarjetaDeCredito = new TarjetaDeCredito(usuarioActual);
+                TarjetaDeCredito tarjetaDeCredito = new TarjetaDeCredito();
                 tarjetaDeCredito.titular = usuarioActual;
                 tarjetaDeCredito.limite = 50000;
                 tarjetaDeCredito.id = usuarioActual.id;
@@ -259,7 +258,7 @@ namespace InterfazTP
             }
         }
 
-        public void BajaTarjetaCredito()
+        public void BajaTarjetaCredito(Usuario usuarioActual)
         {
             if (usuarioActual != null && usuarioActual.tarjeta.Count != 0)
             {
@@ -279,7 +278,7 @@ namespace InterfazTP
 
         }
 
-        public void ModificarTarjetaDeCredito()
+        public void ModificarTarjetaDeCredito(Usuario usuarioActual)
         {
             if (usuarioActual != null)
             {
@@ -292,6 +291,9 @@ namespace InterfazTP
                 }
             }
         }
+
+
+
 
         public List<TarjetaDeCredito> MostrarTarjetasDeCredito()
         {
