@@ -26,7 +26,7 @@ namespace InterfazTP
         // Boton confirmar modificar datos
         private void button1_Click(object sender, EventArgs e)
         {
-            if (banco.ModificarUsuario(textBox5.Text, textBox6.Text, textBox1.Text, textBox2.Text, textBox3.Text, textBox4.Text))
+            if (banco.ModificarUsuario(textBox5.Text, textBox6.Text, textBox1.Text, textBox2.Text, textBox4.Text))
             {
                 MessageBox.Show("Usuario Modificado con exito!");
                 confirmacionModificacion = true;
@@ -39,5 +39,12 @@ namespace InterfazTP
         }
 
         public delegate void TransDelegadoModificarUsuarioOk(bool cofirmacionModificacion);
+
+        // Boton volver atras
+        private void button2_Click(object sender, EventArgs e)
+        {
+            confirmacionModificacion = true;
+            this.TransfEventoModificarUsuarioOk(confirmacionModificacion);
+        }
     }
 }

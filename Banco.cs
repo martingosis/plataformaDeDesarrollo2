@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,56 +48,37 @@ namespace InterfazTP
                 nuevoUsuario.apellido = apellido;
                 nuevoUsuario.dni = dni;
                 nuevoUsuario.email = email;
+                nuevoUsuario.id = Int32.Parse(dni);
 
                 usuario.Add(nuevoUsuario);
                 return true;
             }
         }
 
-        public bool ModificarUsuario(string user, string password, string nombre, string apellido, string dni, string email)
+        public bool ModificarUsuario(string user, string password, string nombre, string apellido, string email)
         {
             bool result = false;
 
             foreach (var usuario in usuario)
             {
-                if (usuario.usuarioLogin == usuarioActual.usuarioLogin)
+                if(usuario.id == usuarioActual.id)
                 {
+                    usuario.usuarioLogin = user;
+                    usuario.password = password;
+                    usuario.nombre = nombre;
+                    usuario.apellido = apellido;
+                    usuario.email = email;
 
-                    if (nombre == "" || apellido == "" || dni == "" || email == "")
-                    {
-                        result = false;
-                    }
-                    else
-                    {
-                        if (user.Length < 8 || password.Length < 8)
-                        {
-                            MessageBox.Show("Usuario y contraseña deben tener minimo 8 caracteres.");
-                            result = false;
-                        }
-                        else
-                        {
-                            usuario.nombre = nombre;
-                            usuario.apellido = apellido;
-                            usuario.email = email;
-                            usuario.usuarioLogin = user;
-                            usuario.password = password;
-
-                            result = true;
-                        }
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("No registrado");
-                    result = false;
+                    result = true;
                 }
             }
-            return result;
+            return result; 
         }
 
         public void EliminarUsuario()
         {
             // Copiar codigo de git
+            
         }
 
         public void AltaCajaAhorro(Usuario usuarioActual)
@@ -157,69 +139,51 @@ namespace InterfazTP
         }
 
         // CLAUDIO
-        public void AltaMovimiento(CajaDeAhorro c, string detalle, float monto)
+        public void AltaMovimiento(Movimiento mov, CajaDeAhorro entrada)
         {
-            c.agregarMovimiento(new Movimiento(c, detalle, monto));
+            movimientos.Add(mov);
+            entrada.movimientos.Add(mov);
         }
 
-        public void AltaPago(Usuario usuario, string nombre, float monto)
+        public void AltaPago(Pago pg, Usuario usuarioA)
         {
-            Pago p = new Pago(usuario, nombre, monto);
-            pagos.Add(p);
-            usuarioActual.pagos.Add(p);
+            usuarioA.pagos.Add(pg);
+            // pg.user = usuarioA;  
         }
 
-        public bool BajaPago(int id)
+        public void BajaPago(int id)
         {
             foreach (var p in pagos)
             {
-                if (p.id == id && p.pagado == true)
+                if (p.id == id)
                 {
                     pagos.Remove(p);
                     usuarioActual.pagos.Remove(p);
-                    return true;
+                }
+                else
+                {
+                    Console.WriteLine("salida en 163");
                 }
             }
-            return false;
         }
 
-        public bool ModificarPago(int id, int identificador)
+        public void ModificarPago(int id)
         {
             foreach (var p in pagos)
             {
-                if (p.id == id && p.pagado == false)
+                if (p.id == (int)id)
                 {
-                    foreach(CajaDeAhorro c in usuarioActual.cajas)
-                    {
-                        if (c.cbu == identificador && c.saldo >= p.monto)
-                        {
-                            p.pagado = true;
-                            c.saldo -= p.monto;
-                            c.agregarMovimiento(new Movimiento(c, "Pago", p.monto));
-                            return true;
-                        }
-                    }
-                    foreach (TarjetaDeCredito t in usuarioActual.tarjetas)
-                    {
-                        if (t.numero == identificador && (t.limite - t.consumos) >= p.monto)
-                        {
-                            p.pagado = true;
-                            t.consumos += p.monto;
-                            return true;
-                        }
-                    }
+                    p.pagado = true;
                 }
             }
-            return false;
         }
 
-        public bool AltaPlazoFijo(Usuario u, float monto, int cbuDestino)
+        public bool AltaPlazoFijo(PlazoFijo pfj, int cbu)
         {
             foreach(CajaDeAhorro c in caja)
             {
-                if(c.cbu == cbuDestino && c.saldo >= monto && monto >= 1000)
+                if(c.cbu == cbu && c.saldo >= pfj.monto && pfj.monto >= 1000)
                 {
-                    PlazoFijo pfj = new PlazoFijo(u, monto);
                     usuarioActual.pf.Add(pfj);
                     plazosFijos.Add(pfj);
                     c.saldo -= pfj.monto;    
@@ -229,21 +193,23 @@ namespace InterfazTP
             return false;
         }
 
-        public bool BajaPlazoFijo(int id)
+        public void BajaPlazoFijo(int id)
         {
             foreach (var p in plazosFijos)
             {
-                if (p.id == id)
+                if (p.id == (int)id)
                 {
-                    if (p.pagado == true && (DateTime.Now - p.fechaFin).TotalDays > 30)
+                    if (p.pagado == true && p.fechaFin > DateTime.Now)
                     {
                         usuarioActual.pf.Remove(p);
                         plazosFijos.Remove(p);
-                        return true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("salida en 208");
                     }
                 }
             }
-            return false;
         }
 
         public void cobrarPlazoFijo(int plazoFijoID)
@@ -258,62 +224,21 @@ namespace InterfazTP
             }
         }
 
-        // LUCAS
-        public void AltaTarjetaCredito(Usuario usuarioActual)
-        {
-            if (usuarioActual != null)
-            {
-                //Datos MOCKEADOS
-                TarjetaDeCredito tarjetaDeCredito = new TarjetaDeCredito();
-                tarjetaDeCredito.titular = usuarioActual;
-                tarjetaDeCredito.limite = 50000;
-                tarjetaDeCredito.id = usuarioActual.id;
-                tarjetaDeCredito.codigoV = new DateOnly(2020, 02, 01);
-                tarjetaDeCredito.consumos = 0;
-                usuarioActual.tarjeta.Add(tarjetaDeCredito);
-            }
-        }
+        // AUGUSTO
 
-        public void BajaTarjetaCredito(Usuario usuarioActual)
+        public void AltaTarjetaCredito(Usuario usuario)
         {
-            if (usuarioActual != null && usuarioActual.tarjeta.Count != 0)
-            {
-                foreach (var t in usuarioActual.tarjeta)
-                {
-                    if (t.consumos == 0)
-                    {
-                        Console.WriteLine("Tarjeta eliminada exitosamente");
-                        usuarioActual.tarjeta.Remove(t);
-                    }
-                    else
-                    {
-                        Console.WriteLine("No se puede eliminar su tarjeta de credito porque tiene consumos pendientes");
-                    }
-                }
-            }
 
         }
 
-        public void ModificarTarjetaDeCredito(Usuario usuarioActual)
+        public void BajaTarjetaCredito()
         {
-            if (usuarioActual != null)
-            {
-                foreach (var t in usuarioActual.tarjeta)
-                {
-                    if (usuarioActual.id == t.id)
-                    {
-                        t.limite = 0;
-                    }
-                }
-            }
+
         }
 
-
-
-
-        public List<TarjetaDeCredito> MostrarTarjetasDeCredito()
+        public void ModificarTarjetaDeCredito()
         {
-            return usuarioActual.tarjeta;
+
         }
 
         // Martin
@@ -377,7 +302,7 @@ namespace InterfazTP
                     if (c.id == idCaja)
                     {
                         c.saldo = monto + c.saldo;
-                        AltaMovimiento(c, "Deposito", monto);
+                        c.agregarMovimiento(new Movimiento(c, "Deposito", monto));
                         return true;
                     }
                 }
@@ -394,8 +319,13 @@ namespace InterfazTP
                     if (c.saldo >= monto && c.id == CajaID)
                     {
                         c.saldo = c.saldo - monto;
-                        AltaMovimiento(c, "Retiro", monto);
+                        c.agregarMovimiento(new Movimiento(c, "Retiro", monto));
                         return true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Fondos insuficientes");
+                        return false;
                     }
                 }
             }
@@ -414,8 +344,8 @@ namespace InterfazTP
                         if (cajaDestinoCBU == ca.cbu)
                         {
                             ca.saldo += monto;
-                            AltaMovimiento(ca, "Transferencia Recibida", monto);
-                            AltaMovimiento(c, "Transferencia Enviada", monto);
+                            ca.agregarMovimiento(new Movimiento(ca, "Transferencia Recibida", monto));
+                            c.agregarMovimiento(new Movimiento(c, "Transferencia Enviada", monto));
                             return true;
                         }
                     }
@@ -426,11 +356,17 @@ namespace InterfazTP
 
 
         // MOSTRAR DATOS - Nico
-
-        public List<CajaDeAhorro> MostrarCajasDeAhorro()
+        public List<Pago> MostrarPagos()
         {
-            return this.usuarioActual.cajas.ToList();
+            // Verificar el devolver con toList
+            return usuarioActual.pagos.ToList();
         }
+
+        public List<PlazoFijo> MostrarPlazoFijos()
+        {
+            return usuarioActual.pf.ToList();
+        }
+
         public List<Movimiento> MostrarMovimientos(int cajaID)
         {
             if (usuarioActual != null)
@@ -445,16 +381,6 @@ namespace InterfazTP
             }
             return null;
         }
-        public List<Pago> MostrarPagos()
-        {
-            return usuarioActual.pagos.ToList();
-        }
-
-        public List<PlazoFijo> MostrarPlazoFijos()
-        {
-            return usuarioActual.pf.ToList();
-        }
-
 
         public List<Movimiento> BuscarMovimiento(CajaDeAhorro cajas, String detalle, DateTime fecha, float monto)
         {
@@ -476,6 +402,10 @@ namespace InterfazTP
                     }
                 }
             }
+            else
+            {
+                Console.WriteLine("error en la lista 135");
+            }
             return nuevo;
         }
 
@@ -490,6 +420,25 @@ namespace InterfazTP
                 }
             }
             return res;
+        }
+
+        public List<CajaDeAhorro> MostrarCajasDeAhorro()
+        {
+            return this.usuarioActual.cajas.ToList();
+        }
+
+        // Metodos para Eliminar y Agregar titulares de Caja de Ahorro
+
+        public bool EliminarTitularCaja()
+        {
+            bool resultado = true;
+            return resultado;
+        }
+
+        public bool AgregarTitularCaja()
+        {
+            bool resultado = true;
+            return resultado;
         }
     }
 }

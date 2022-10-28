@@ -23,7 +23,7 @@ namespace InterfazTP
             this.titular = titular;
             this.monto = monto;
             this.fechaIni = DateTime.Now;
-            this.fechaFin = DateTime.Now.AddYears(1);
+            this.fechaFin.AddYears(0001);
             pagado = false;
         }
 

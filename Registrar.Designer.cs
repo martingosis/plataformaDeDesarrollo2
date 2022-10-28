@@ -42,6 +42,7 @@
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.textBox6 = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
+            this.button2 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -121,6 +122,7 @@
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(100, 23);
             this.textBox2.TabIndex = 8;
+            this.textBox2.UseSystemPasswordChar = true;
             // 
             // textBox3
             // 
@@ -159,11 +161,22 @@
             this.label8.TabIndex = 15;
             this.label8.Text = "Home Banking";
             // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(360, 347);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 16;
+            this.button2.Text = "Atras";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
             // Registrar
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.textBox6);
             this.Controls.Add(this.textBox5);
@@ -180,7 +193,6 @@
             this.Controls.Add(this.button1);
             this.Name = "Registrar";
             this.Text = "Registrar";
-            this.Load += new System.EventHandler(this.Registrar_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -202,5 +214,6 @@
         private TextBox textBox5;
         private TextBox textBox6;
         private Label label8;
+        private Button button2;
     }
 }
