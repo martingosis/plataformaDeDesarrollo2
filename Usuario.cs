@@ -23,7 +23,7 @@ namespace InterfazTP
         public bool administrador { get; set; }
         public List<CajaDeAhorro> cajas { get; set; }
         public List<PlazoFijo> pf { get; set; }
-        public List<TarjetaDeCredito> tarjeta { get; set; }
+        public List<TarjetaDeCredito> tarjetas { get; set; }
         public List<Pago> pagos { get; set; }
 
         public Usuario()
@@ -34,7 +34,7 @@ namespace InterfazTP
 
             pagos = new List<Pago>();
 
-            tarjeta = new List<TarjetaDeCredito>();
+            tarjetas = new List<TarjetaDeCredito>();
 
             pf = new List<PlazoFijo>();
 
@@ -53,6 +53,11 @@ namespace InterfazTP
         public List<CajaDeAhorro> obtenerCajas()
         {
             return cajas.ToList();
+        }
+
+        public List<TarjetaDeCredito> obtenerTarjetas()
+        {
+            return tarjetas.ToList();
         }
     }
 }
