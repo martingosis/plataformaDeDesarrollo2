@@ -157,51 +157,69 @@ namespace InterfazTP
         }
 
         // CLAUDIO
-        public void AltaMovimiento(Movimiento mov, CajaDeAhorro entrada)
+        public void AltaMovimiento(CajaDeAhorro c, string detalle, float monto)
         {
-            movimientos.Add(mov);
-            entrada.movimientos.Add(mov);
+            c.agregarMovimiento(new Movimiento(c, detalle, monto));
         }
 
-        public void AltaPago(Pago pg, Usuario usuarioA)
+        public void AltaPago(Usuario usuario, string nombre, float monto)
         {
-            usuarioA.pagos.Add(pg);
-            // pg.user = usuarioA;  
+            Pago p = new Pago(usuario, nombre, monto);
+            pagos.Add(p);
+            usuarioActual.pagos.Add(p);
         }
 
-        public void BajaPago(int id)
+        public bool BajaPago(int id)
         {
             foreach (var p in pagos)
             {
-                if (p.id == id)
+                if (p.id == id && p.pagado == true)
                 {
                     pagos.Remove(p);
                     usuarioActual.pagos.Remove(p);
-                }
-                else
-                {
-                    Console.WriteLine("salida en 163");
+                    return true;
                 }
             }
+            return false;
         }
 
-        public void ModificarPago(int id)
+        public bool ModificarPago(int id, int identificador)
         {
             foreach (var p in pagos)
             {
-                if (p.id == (int)id)
+                if (p.id == id && p.pagado == false)
                 {
-                    p.pagado = true;
+                    foreach(CajaDeAhorro c in usuarioActual.cajas)
+                    {
+                        if (c.cbu == identificador && c.saldo >= p.monto)
+                        {
+                            p.pagado = true;
+                            c.saldo -= p.monto;
+                            c.agregarMovimiento(new Movimiento(c, "Pago", p.monto));
+                            return true;
+                        }
+                    }
+                    foreach (TarjetaDeCredito t in usuarioActual.tarjetas)
+                    {
+                        if (t.numero == identificador && (t.limite - t.consumos) >= p.monto)
+                        {
+                            p.pagado = true;
+                            t.consumos += p.monto;
+                            return true;
+                        }
+                    }
                 }
             }
+            return false;
         }
 
-        public bool AltaPlazoFijo(PlazoFijo pfj, int cbu)
+        public bool AltaPlazoFijo(Usuario u, float monto, int cbuDestino)
         {
             foreach(CajaDeAhorro c in caja)
             {
-                if(c.cbu == cbu && c.saldo >= pfj.monto && pfj.monto >= 1000)
+                if(c.cbu == cbuDestino && c.saldo >= monto && monto >= 1000)
                 {
+                    PlazoFijo pfj = new PlazoFijo(u, monto);
                     usuarioActual.pf.Add(pfj);
                     plazosFijos.Add(pfj);
                     c.saldo -= pfj.monto;    
@@ -211,23 +229,21 @@ namespace InterfazTP
             return false;
         }
 
-        public void BajaPlazoFijo(int id)
+        public bool BajaPlazoFijo(int id)
         {
             foreach (var p in plazosFijos)
             {
-                if (p.id == (int)id)
+                if (p.id == id)
                 {
-                    if (p.pagado == true && p.fechaFin > DateTime.Now)
+                    if (p.pagado == true && (DateTime.Now - p.fechaFin).TotalDays > 30)
                     {
                         usuarioActual.pf.Remove(p);
                         plazosFijos.Remove(p);
-                    }
-                    else
-                    {
-                        Console.WriteLine("salida en 208");
+                        return true;
                     }
                 }
             }
+            return false;
         }
 
         public void cobrarPlazoFijo(int plazoFijoID)
@@ -320,7 +336,7 @@ namespace InterfazTP
                     if (c.id == idCaja)
                     {
                         c.saldo = monto + c.saldo;
-                        c.agregarMovimiento(new Movimiento(c, "Deposito", monto));
+                        AltaMovimiento(c, "Deposito", monto);
                         return true;
                     }
                 }
@@ -337,13 +353,8 @@ namespace InterfazTP
                     if (c.saldo >= monto && c.id == CajaID)
                     {
                         c.saldo = c.saldo - monto;
-                        c.agregarMovimiento(new Movimiento(c, "Retiro", monto));
+                        AltaMovimiento(c, "Retiro", monto);
                         return true;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Fondos insuficientes");
-                        return false;
                     }
                 }
             }
@@ -362,8 +373,8 @@ namespace InterfazTP
                         if (cajaDestinoCBU == ca.cbu)
                         {
                             ca.saldo += monto;
-                            ca.agregarMovimiento(new Movimiento(ca, "Transferencia Recibida", monto));
-                            c.agregarMovimiento(new Movimiento(c, "Transferencia Enviada", monto));
+                            AltaMovimiento(ca, "Transferencia Recibida", monto);
+                            AltaMovimiento(c, "Transferencia Enviada", monto);
                             return true;
                         }
                     }
@@ -374,17 +385,11 @@ namespace InterfazTP
 
 
         // MOSTRAR DATOS - Nico
-        public List<Pago> MostrarPagos()
-        {
-            // Verificar el devolver con toList
-            return usuarioActual.pagos.ToList();
-        }
 
-        public List<PlazoFijo> MostrarPlazoFijos()
+        public List<CajaDeAhorro> MostrarCajasDeAhorro()
         {
-            return usuarioActual.pf.ToList();
+            return this.usuarioActual.cajas.ToList();
         }
-
         public List<Movimiento> MostrarMovimientos(int cajaID)
         {
             if (usuarioActual != null)
@@ -399,6 +404,16 @@ namespace InterfazTP
             }
             return null;
         }
+        public List<Pago> MostrarPagos()
+        {
+            return usuarioActual.pagos.ToList();
+        }
+
+        public List<PlazoFijo> MostrarPlazoFijos()
+        {
+            return usuarioActual.pf.ToList();
+        }
+
 
         public List<Movimiento> BuscarMovimiento(CajaDeAhorro cajas, String detalle, DateTime fecha, float monto)
         {
@@ -420,10 +435,6 @@ namespace InterfazTP
                     }
                 }
             }
-            else
-            {
-                Console.WriteLine("error en la lista 135");
-            }
             return nuevo;
         }
 
@@ -438,11 +449,6 @@ namespace InterfazTP
                 }
             }
             return res;
-        }
-
-        public List<CajaDeAhorro> MostrarCajasDeAhorro()
-        {
-            return this.usuarioActual.cajas.ToList();
         }
     }
 }
