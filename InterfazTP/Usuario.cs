@@ -10,7 +10,8 @@ namespace InterfazTP
     public class Usuario
     {
         public string usuarioLogin { get; set; }
-        public string id { get; set; }
+        public int id { get; set; }
+        public static int ultimoId = 0;
         public string dni { get; set; }
         public string nombre { get; set; }
         public string apellido { get; set; }
@@ -18,6 +19,8 @@ namespace InterfazTP
         public string password { get; set; }
         public int intentosFallidos { get; set; }
         public bool bloqueado { get; set; }
+
+        public bool administrador { get; set; }
         public List<CajaDeAhorro> cajas { get; set; }
         public List<PlazoFijo> pf { get; set; }
         public List<TarjetaDeCredito> tarjeta { get; set; }
@@ -25,6 +28,8 @@ namespace InterfazTP
 
         public Usuario()
         {
+            id = generarId();
+
             bloqueado = false;
 
             pagos = new List<Pago>();
@@ -34,7 +39,15 @@ namespace InterfazTP
             pf = new List<PlazoFijo>();
 
             cajas = new List<CajaDeAhorro>(10);
+            
+            administrador = false;
 
+        }
+
+        private int generarId()
+        {
+            ultimoId++;
+            return ultimoId;
         }
 
         public List<CajaDeAhorro> obtenerCajas()

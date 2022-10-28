@@ -40,6 +40,21 @@ namespace InterfazTP
             return cbuAnterior;
         }
 
+        public void agregarMovimiento(Movimiento mov)
+        {
+            this.movimientos.Add(mov);
+        }
+
+        public List<Movimiento> obetenerMovimientos()
+        {
+            return this.movimientos.ToList();
+        }
+
+        public List<Usuario> obtenerTitulares()
+        {
+            return titular.ToList();
+        }
+ 
         public string[] toArray()
         {
             return new string[] {id.ToString(), cbu.ToString(), saldo.ToString()};

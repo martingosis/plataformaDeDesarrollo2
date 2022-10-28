@@ -17,6 +17,7 @@ namespace InterfazTP
         public string pass;
         public Banco banco;
         public bool confirmacionRegistro;
+        public bool volverAtras;
 
         public TransfDelegadoRegisterOK TransEventoRegisterOk;
 
@@ -44,16 +45,11 @@ namespace InterfazTP
 
         public delegate void TransfDelegadoRegisterOK(bool confirmacionRegistro);
 
-        private void Registrar_Load(object sender, EventArgs e)
+        // Boton Volver para atras
+        private void button2_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void RegistrarVolver_Click(object sender, EventArgs e)
-        {
-            this.Close();
-            Form1 frm = new Form1();
-            frm.Show();
+            confirmacionRegistro = true;
+            this.TransEventoRegisterOk(confirmacionRegistro);
         }
     }
 }
